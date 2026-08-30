@@ -36,9 +36,7 @@ export const moodService = {
     const entries = this.getAllEntries()
     if (entries.length === 0) return 0
 
-    const daysWithEntry = new Set(
-      entries.map((e) => new Date(e.timestamp).toDateString())
-    )
+    const daysWithEntry = new Set(entries.map((e) => new Date(e.timestamp).toDateString()))
 
     let streak = 0
     const cursor = new Date()
@@ -49,5 +47,25 @@ export const moodService = {
     }
 
     return streak
+  },
+
+  getWeeklyAverageMood(): MoodLevel | null {
+    const entries = this.getRecentEntries(7)
+    if (entries.length === 0) return null
+
+    const levelToNumber: Record<MoodLevel, number> = {
+      very_low: 1,
+      low: 2,
+      neutral: 3,
+      good: 4,
+      great: 5,
+    }
+    const numberToLevel: MoodLevel[] = ['very_low', 'low', 'neutral', 'good', 'great']
+
+    const sum = entries.reduce((acc, e) => acc + levelToNumber[e.level], 0)
+    const avg = Math.round(sum / entries.length)
+    const clamped = Math.min(5, Math.max(1, avg))
+
+    return numberToLevel[clamped - 1]
   },
 }
