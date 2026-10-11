@@ -1,82 +1,200 @@
 @import "tailwindcss";
 
+/* =========================================================
+   ATMOSPHERES (scene palettes)
+   ========================================================= */
+:root,
+html[data-scene="sunrise"] {
+  --page-bg: #fff6ec;
+  --bg-gradient: linear-gradient(160deg, #fff3e2 0%, #ffe0cf 48%, #ffd6e2 100%);
+  --blob-1: rgba(255, 165, 115, 0.5);
+  --blob-2: rgba(255, 205, 140, 0.5);
+  --blob-3: rgba(255, 150, 175, 0.35);
+  --ink: #3b2a26;
+  --ink-soft: #55413c;
+  --ink-muted: #7a6560;
+  --ink-faint: #9c8a84;
+  --surface-2: rgba(255, 255, 255, 0.8);
+  --surface-3: rgba(140, 80, 50, 0.1);
+  --field: rgba(255, 255, 255, 0.85);
+  --line: rgba(140, 80, 50, 0.18);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-line: rgba(255, 255, 255, 0.75);
+  --glass-solid: #ffffff;
+  --glass-shadow: 0 10px 32px -14px rgba(190, 100, 60, 0.35);
+  --on-primary: #ffffff;
+  --color-primary: #d9532f;
+  --color-accent: #f59e73;
+}
+
+html[data-scene="meadow"] {
+  --page-bg: #f0f8f1;
+  --bg-gradient: linear-gradient(160deg, #eaf7ec 0%, #d8f0df 50%, #d3edf0 100%);
+  --blob-1: rgba(110, 200, 140, 0.45);
+  --blob-2: rgba(170, 225, 170, 0.5);
+  --blob-3: rgba(110, 210, 200, 0.35);
+  --ink: #1f3a2b;
+  --ink-soft: #335044;
+  --ink-muted: #587264;
+  --ink-faint: #7c9487;
+  --surface-2: rgba(255, 255, 255, 0.8);
+  --surface-3: rgba(30, 90, 50, 0.1);
+  --field: rgba(255, 255, 255, 0.85);
+  --line: rgba(30, 90, 50, 0.18);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-line: rgba(255, 255, 255, 0.75);
+  --glass-solid: #ffffff;
+  --glass-shadow: 0 10px 32px -14px rgba(40, 120, 70, 0.35);
+  --on-primary: #ffffff;
+  --color-primary: #2f8f5b;
+  --color-accent: #7fcb9b;
+}
+
+html[data-scene="ocean"] {
+  --page-bg: #edf8fc;
+  --bg-gradient: linear-gradient(160deg, #e4f5fc 0%, #cdebf6 50%, #dde3fb 100%);
+  --blob-1: rgba(90, 190, 230, 0.45);
+  --blob-2: rgba(120, 170, 240, 0.4);
+  --blob-3: rgba(110, 220, 210, 0.35);
+  --ink: #17364a;
+  --ink-soft: #2b4f66;
+  --ink-muted: #4f7188;
+  --ink-faint: #7592a6;
+  --surface-2: rgba(255, 255, 255, 0.8);
+  --surface-3: rgba(20, 90, 130, 0.1);
+  --field: rgba(255, 255, 255, 0.85);
+  --line: rgba(20, 90, 130, 0.18);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-line: rgba(255, 255, 255, 0.75);
+  --glass-solid: #ffffff;
+  --glass-shadow: 0 10px 32px -14px rgba(20, 110, 160, 0.35);
+  --on-primary: #ffffff;
+  --color-primary: #0f7fa8;
+  --color-accent: #6cc3e0;
+}
+
+html[data-scene="lavender"] {
+  --page-bg: #f6f1fd;
+  --bg-gradient: linear-gradient(160deg, #f4eefd 0%, #e6dcf9 50%, #fadcec 100%);
+  --blob-1: rgba(170, 140, 240, 0.45);
+  --blob-2: rgba(220, 160, 230, 0.4);
+  --blob-3: rgba(150, 170, 250, 0.35);
+  --ink: #2e2447;
+  --ink-soft: #463a66;
+  --ink-muted: #6a5e8a;
+  --ink-faint: #8e83aa;
+  --surface-2: rgba(255, 255, 255, 0.8);
+  --surface-3: rgba(80, 50, 140, 0.1);
+  --field: rgba(255, 255, 255, 0.85);
+  --line: rgba(80, 50, 140, 0.18);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-line: rgba(255, 255, 255, 0.75);
+  --glass-solid: #ffffff;
+  --glass-shadow: 0 10px 32px -14px rgba(110, 80, 190, 0.35);
+  --on-primary: #ffffff;
+  --color-primary: #7c5cc4;
+  --color-accent: #b9a4ec;
+}
+
+html[data-scene="starlit"] {
+  --page-bg: #1b1433;
+  --bg-gradient: linear-gradient(160deg, #1f1745 0%, #2b1f58 50%, #3a2466 100%);
+  --blob-1: rgba(157, 140, 255, 0.3);
+  --blob-2: rgba(240, 150, 200, 0.18);
+  --blob-3: rgba(110, 170, 255, 0.18);
+  --ink: #f4efff;
+  --ink-soft: #d9d0f2;
+  --ink-muted: #afa4d0;
+  --ink-faint: #8a7fb0;
+  --surface-2: rgba(255, 255, 255, 0.09);
+  --surface-3: rgba(255, 255, 255, 0.14);
+  --field: rgba(255, 255, 255, 0.07);
+  --line: rgba(255, 255, 255, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-line: rgba(255, 255, 255, 0.14);
+  --glass-solid: #2b2058;
+  --glass-shadow: 0 10px 32px -14px rgba(10, 5, 40, 0.6);
+  --on-primary: #1b1630;
+  --color-primary: #a596ff;
+  --color-accent: #d2c9ff;
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
 body {
+  font-family: 'Nunito', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--page-bg);
+  color: var(--ink);
   min-height: 100vh;
-  transition: background-color 0.4s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* ---------- Dark (default) ---------- */
-body {
-  background-color: #0b1120;
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 30%, transparent);
 }
 
-/* ---------- Light mode — "Soft Paper" theme ---------- */
-.light-mode body {
-  background-color: #FAF7F2;
-}
+/* =========================================================
+   Remap existing utility classes to the active atmosphere
+   ========================================================= */
+html[data-scene] .text-white { color: var(--ink) !important; }
+html[data-scene] .text-slate-200,
+html[data-scene] .text-slate-300 { color: var(--ink-soft) !important; }
+html[data-scene] .text-slate-400 { color: var(--ink-muted) !important; }
+html[data-scene] .text-slate-500 { color: var(--ink-faint) !important; }
 
-.light-mode .glass {
-  background: rgba(255, 255, 255, 0.85) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-}
+html[data-scene] .bg-slate-900 { background-color: var(--field) !important; }
+html[data-scene] .bg-slate-800 { background-color: var(--surface-2) !important; }
+html[data-scene] .bg-slate-700 { background-color: var(--surface-3) !important; }
+html[data-scene] .border-slate-700 { border-color: var(--line) !important; }
 
-.light-mode .glass:hover {
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.12);
-}
+html[data-scene] [class~="hover:bg-slate-700"]:hover,
+html[data-scene] [class~="hover:bg-slate-800"]:hover { background-color: var(--surface-3) !important; }
+html[data-scene] [class~="hover:text-white"]:hover,
+html[data-scene] [class~="hover:text-slate-300"]:hover { color: var(--ink) !important; }
 
-.light-mode .text-white {
-  color: #2D2A26 !important;
-}
+html[data-scene] .placeholder-slate-500::placeholder { color: var(--ink-faint) !important; opacity: 1; }
 
-.light-mode .text-slate-300 {
-  color: #4A4640 !important;
-}
+/* Text sitting on a primary-colored background */
+html[data-scene] .btn-primary,
+html[data-scene] [class~="bg-[var(--color-primary)]"] { color: var(--on-primary) !important; }
+html[data-scene] .btn-primary .text-white,
+html[data-scene] [class~="bg-[var(--color-primary)]"] .text-white { color: var(--on-primary) !important; }
 
-.light-mode .text-slate-400 {
-  color: #6B6660 !important;
-}
+/* Readable status colors on light atmospheres */
+html[data-tone="light"] .text-green-400 { color: #15803d !important; }
+html[data-tone="light"] .text-yellow-400 { color: #a16207 !important; }
+html[data-tone="light"] .text-orange-400 { color: #c2410c !important; }
+html[data-tone="light"] .text-red-300,
+html[data-tone="light"] .text-red-500 { color: #b91c1c !important; }
+html[data-tone="light"] .text-red-400 { color: #dc2626 !important; }
+html[data-tone="light"] .text-amber-400 { color: #b45309 !important; }
+html[data-tone="light"] .fill-amber-400 { fill: #d97706 !important; }
+html[data-tone="light"] .text-rose-300 { color: #be123c !important; }
+html[data-tone="light"] .text-rose-400 { color: #e11d48 !important; }
 
-.light-mode .text-slate-500 {
-  color: #8A857D !important;
-}
-
-.light-mode .border-slate-700 {
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-.light-mode .bg-slate-700 {
-  background-color: #EFE9E1 !important;
-}
-
-.light-mode .bg-slate-800 {
-  background-color: #FFFFFF !important;
-}
-
-.light-mode .bg-slate-900 {
-  background-color: #FAF7F2 !important;
-}
-
-.light-mode .hover\:bg-slate-700:hover {
-  background-color: #EFE9E1 !important;
-}
-
-/* ---------- Glassmorphism card ---------- */
+/* =========================================================
+   Glass cards + buttons
+   ========================================================= */
 .glass {
-  background: rgba(30, 41, 59, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--glass-shadow);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .glass:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4);
   border-color: var(--color-primary);
 }
 
-/* ---------- Buttons micro-interaction ---------- */
+nav.glass:hover {
+  transform: none;
+  border-color: var(--glass-line);
+}
+
 .btn-primary {
   background: var(--color-primary);
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
@@ -84,82 +202,122 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 24px -4px var(--color-primary);
+  box-shadow: 0 8px 24px -6px var(--color-primary);
 }
 
 .btn-primary:active {
   transform: scale(0.97);
 }
 
-/* ---------- Ambient blobs ---------- */
+/* =========================================================
+   Ambient background
+   ========================================================= */
+.scene-bg {
+  background: var(--bg-gradient);
+}
+
+.scene-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+}
+
+.scene-blob-1 { top: -12%; left: -8%; width: 520px; height: 520px; background: var(--blob-1); }
+.scene-blob-2 { bottom: -16%; right: -10%; width: 620px; height: 620px; background: var(--blob-2); }
+.scene-blob-3 { top: 32%; right: 22%; width: 360px; height: 360px; background: var(--blob-3); }
+
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.15); }
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
 }
-
 @keyframes pulse-slower {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.2); }
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.18); }
 }
-
 @keyframes float {
   0%, 100% { transform: translateY(0) translateX(0); }
   50% { transform: translateY(-30px) translateX(25px); }
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 8s ease-in-out infinite;
+.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
+.animate-pulse-slower { animation: pulse-slower 12s ease-in-out infinite; }
+.animate-float { animation: float 10s ease-in-out infinite; }
+
+/* =========================================================
+   Atmosphere decor (sparkles, leaves, bubbles, petals, stars)
+   ========================================================= */
+.decor {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
 }
 
-.animate-pulse-slower {
-  animation: pulse-slower 12s ease-in-out infinite;
+@keyframes decor-rise {
+  0% { transform: translate3d(0, 105vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.75; }
+  90% { opacity: 0.5; }
+  100% { transform: translate3d(30px, -12vh, 0) rotate(20deg); opacity: 0; }
 }
 
-.animate-float {
-  animation: float 10s ease-in-out infinite;
+@keyframes decor-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.85; }
+  50% { transform: translate3d(40px, 50vh, 0) rotate(160deg); }
+  90% { opacity: 0.6; }
+  100% { transform: translate3d(-30px, 108vh, 0) rotate(320deg); opacity: 0; }
 }
 
-/* ---------- Floating emoji ---------- */
+@keyframes decor-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 0.95; transform: scale(1.15); }
+}
+
+.decor-rise { animation: decor-rise linear infinite; }
+.decor-fall { animation: decor-fall linear infinite; }
+.decor-twinkle { animation: decor-twinkle ease-in-out infinite; }
+.decor-bubble {
+  border-radius: 9999px;
+  border: 1.5px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  animation: decor-rise ease-in infinite;
+}
+
+/* =========================================================
+   Other animations
+   ========================================================= */
 @keyframes float-up {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
 }
+.float-up { animation: float-up linear forwards; }
 
-.float-up {
-  animation: float-up linear forwards;
-}
-
-/* ---------- Mood orb breathing ---------- */
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
+.mood-orb { animation: breathe 4s ease-in-out infinite; }
 
-.mood-orb {
-  animation: breathe 4s ease-in-out infinite;
-}
-
-/* ---------- Page fade-in ---------- */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.page-enter {
-  animation: fade-in 0.4s ease-out;
-}
-
-@keyframes drift {
-  0% { transform: translateY(0) translateX(0); opacity: 0; }
-  10% { opacity: 0.4; }
-  50% { transform: translateY(-50vh) translateX(15px); }
-  90% { opacity: 0.3; }
-  100% { transform: translateY(-105vh) translateX(-15px); opacity: 0; }
-}
-.drift { animation: drift linear infinite; }
+.page-enter { animation: fade-in 0.4s ease-out; }
 
 @keyframes cozy-in {
   from { opacity: 0; transform: scale(0.96) translateY(10px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
-.cozy-in { animation: cozy-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cozy-in { animation: cozy-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .decor,
+  .animate-pulse-slow,
+  .animate-pulse-slower,
+  .animate-float,
+  .mood-orb,
+  .cozy-in,
+  .page-enter {
+    animation: none !important;
+  }
+}

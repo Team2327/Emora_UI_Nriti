@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import { AmbientBackground } from '../components/ui/AmbientBackground'
 import { authService } from '../services/authService'
@@ -22,19 +22,27 @@ export default function Auth() {
       return
     }
 
-    if (mode === 'signup') {
-      authService.signup(name, email, password)
-    } else {
-      authService.login(email, password)
+    const result =
+      mode === 'signup'
+        ? authService.signup(name, email, password)
+        : authService.login(email, password)
+
+    if (!result.ok) {
+      setError(result.error)
+      return
     }
     navigate('/dashboard')
+  }
+
+  if (authService.isLoggedIn()) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4">
       <AmbientBackground />
 
-      <div className="w-full max-w-md bg-slate-800/80 backdrop-blur-md rounded-2xl p-8 border border-slate-700 space-y-6">
+      <div className="w-full max-w-md glass cozy-in rounded-2xl p-8 space-y-6">
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-bold text-white">
             {mode === 'login' ? 'Welcome back' : 'Create your account'}
@@ -93,7 +101,7 @@ export default function Auth() {
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-lg bg-[var(--color-primary)] text-white font-semibold hover:opacity-90 transition"
+            className="w-full py-2.5 rounded-lg btn-primary bg-[var(--color-primary)] text-white font-semibold"
           >
             {mode === 'login' ? 'Log In' : 'Sign Up'}
           </button>

@@ -1,39 +1,44 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { themeService } from '../../services/themeService'
-import type { ThemePreference } from '../../types/theme'
+import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react'
+import { themeService, type EffectiveColors } from '../../services/themeService'
+import { SCENES, type SceneConfig, type ThemePreference } from '../../types/theme'
 
 interface ThemeContextValue {
   theme: ThemePreference
-  colors: { primary: string; accent: string }
+  scene: SceneConfig
+  colors: EffectiveColors
   updateTheme: (theme: ThemePreference) => void
-  toggleMode: () => void
+  refreshColors: () => void
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<ThemePreference>(themeService.getTheme())
-  const [colors, setColors] = useState(themeService.getEffectiveColors())
+  const [theme, setTheme] = useState<ThemePreference>(() => themeService.getTheme())
+  const [, setTick] = useState(0)
 
-  useEffect(() => {
-    const effective = themeService.getEffectiveColors()
-    setColors(effective)
-    document.documentElement.style.setProperty('--color-primary', effective.primary)
-    document.documentElement.style.setProperty('--color-accent', effective.accent)
-    document.documentElement.classList.toggle('light-mode', theme.mode === 'light')
-  }, [theme])
+  const scene = SCENES[themeService.getActiveSceneId(theme)]
+  const colors = themeService.getEffectiveColors(theme)
+
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    root.dataset.scene = scene.id
+    root.dataset.tone = scene.tone
+    root.style.setProperty('--color-primary', colors.primary)
+    root.style.setProperty('--color-accent', colors.accent)
+    root.style.setProperty('--on-primary', colors.onPrimary)
+  }, [scene.id, scene.tone, colors.primary, colors.accent, colors.onPrimary])
 
   function updateTheme(newTheme: ThemePreference) {
     themeService.saveTheme(newTheme)
     setTheme(newTheme)
   }
 
-  function toggleMode() {
-    updateTheme({ ...theme, mode: theme.mode === 'dark' ? 'light' : 'dark' })
+  function refreshColors() {
+    setTick((t) => t + 1)
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, colors, updateTheme, toggleMode }}>
+    <ThemeContext.Provider value={{ theme, scene, colors, updateTheme, refreshColors }}>
       {children}
     </ThemeContext.Provider>
   )

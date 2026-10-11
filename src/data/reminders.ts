@@ -1,0 +1,16 @@
+export const REMINDERS: string[] = [
+  "You don't have to feel better all at once. One small step is enough for today.",
+  "Rest is not a reward you earn. It's something you're allowed to need.",
+  'Your feelings are valid, even the ones that are hard to explain.',
+  'Be as gentle with yourself as you would be with a friend.',
+  'A slow day is still a day you showed up for.',
+  "Take a breath. You've handled hard days before, and you're still here.",
+  'Progress can look quiet: a glass of water, a short walk, a kind message.',
+  "It's okay to ask for help. That is strength, not weakness.",
+  'Your mind needs care too. Check in with it often.',
+  'Not every thought is a fact. Let the loud ones pass.',
+  'Small joys count. Notice one thing that felt good today.',
+  "You're allowed to take things one hour at a time.",
+  'Comparison steals calm. Your pace is your own.',
+  'Today does not have to be perfect to be worth it.',
+]

@@ -19,40 +19,34 @@ export function MoodIndicator({ onLogged }: { onLogged?: () => void }) {
     setTrigger((t) => t + 1)
   }
 
-  function handleSaveNote() {
-    if (selected) {
-      moodService.addEntry(selected, note.trim() || undefined)
-      setSaved(true)
-      setShowNote(false)
-      setNote('')
-      onLogged?.()
-    }
-  }
-
-  function handleSkipNote() {
-    if (selected) {
-      moodService.addEntry(selected)
-      setSaved(true)
-      setShowNote(false)
-      onLogged?.()
-    }
+  function finish(withNote: boolean) {
+    if (!selected) return
+    moodService.addEntry(selected, withNote ? note : undefined)
+    setSaved(true)
+    setShowNote(false)
+    setNote('')
+    onLogged?.()
   }
 
   return (
     <>
       <div className="glass cozy-in rounded-2xl p-5">
         <p className="mb-3 text-sm text-slate-300">How are you feeling today?</p>
-        <div className="flex gap-3">
+
+        <div className="grid grid-cols-5 gap-2">
           {MOODS.map((level) => (
             <button
               key={level}
               onClick={() => handleSelect(level)}
-              title={MOOD_LABELS[level]}
-              className={`text-2xl p-2 rounded-full transition-all duration-200 ${
-                selected === level ? 'bg-[var(--color-primary)] scale-125' : 'hover:bg-slate-700 hover:scale-110'
+              aria-label={MOOD_LABELS[level]}
+              className={`flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-200 ${
+                selected === level
+                  ? 'bg-[var(--color-primary)]/15 ring-2 ring-[var(--color-primary)] scale-105'
+                  : 'hover:bg-slate-700 hover:scale-105'
               }`}
             >
-              {MOOD_EMOJIS[level]}
+              <span className="text-3xl">{MOOD_EMOJIS[level]}</span>
+              <span className="text-[11px] text-slate-400">{MOOD_LABELS[level]}</span>
             </button>
           ))}
         </div>
@@ -65,18 +59,19 @@ export function MoodIndicator({ onLogged }: { onLogged?: () => void }) {
               onChange={(e) => setNote(e.target.value)}
               placeholder="What's on your mind..."
               rows={2}
+              maxLength={300}
               className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-[var(--color-primary)] resize-none"
             />
             <div className="flex gap-2">
               <button
-                onClick={handleSaveNote}
-                className="px-4 py-1.5 rounded-full btn-primary bg-[var(--color-primary)] text-white text-sm font-medium"
+                onClick={() => finish(true)}
+                className="px-4 py-1.5 rounded-full btn-primary bg-[var(--color-primary)] text-white text-sm font-semibold"
               >
                 Save
               </button>
               <button
-                onClick={handleSkipNote}
-                className="px-4 py-1.5 rounded-full text-slate-400 text-sm hover:text-slate-300"
+                onClick={() => finish(false)}
+                className="px-4 py-1.5 rounded-full text-slate-400 text-sm hover:text-white"
               >
                 Skip
               </button>
@@ -84,10 +79,9 @@ export function MoodIndicator({ onLogged }: { onLogged?: () => void }) {
           </div>
         )}
 
-        {saved && (
-          <p className="mt-3 text-xs text-green-400 cozy-in">Mood logged 🌿</p>
-        )}
+        {saved && <p className="mt-3 text-xs text-green-400 cozy-in">Mood logged 🌿</p>}
       </div>
+
       {selected && <FloatingEmojiLayer trigger={trigger} emoji={MOOD_EMOJIS[selected]} />}
     </>
   )

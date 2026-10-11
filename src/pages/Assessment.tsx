@@ -1,130 +1,195 @@
 import { useState } from 'react'
-import { AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react'
-import { PHQ9_QUESTIONS, GAD7_QUESTIONS, ANSWER_OPTIONS, type Question } from '../data/assessmentQuestions'
+import { Link } from 'react-router-dom'
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { ANSWER_OPTIONS } from '../data/assessmentQuestions'
+import { assessmentService } from '../services/assessmentService'
+import { recommendationService } from '../services/recommendationService'
+import {
+  ASSESSMENT_TITLES,
+  type AssessmentResult,
+  type AssessmentType,
+  type SeverityKey,
+} from '../types/assessment'
+import { SafetyCard } from '../components/ui/SafetyCard'
+import { RecommendationCards } from '../components/recommendation/RecommendationCards'
+import { EmptyState } from '../components/ui/EmptyState'
 
-type AssessmentType = 'phq9' | 'gad7'
+const SEVERITY_COLORS: Record<SeverityKey, string> = {
+  minimal: 'text-green-400',
+  mild: 'text-yellow-400',
+  moderate: 'text-orange-400',
+  moderately_severe: 'text-red-400',
+  severe: 'text-red-500',
+}
 
-function getSeverity(type: AssessmentType, score: number) {
-  if (type === 'phq9') {
-    if (score <= 4) return { label: 'Minimal', color: 'text-green-400' }
-    if (score <= 9) return { label: 'Mild', color: 'text-yellow-400' }
-    if (score <= 14) return { label: 'Moderate', color: 'text-orange-400' }
-    if (score <= 19) return { label: 'Moderately Severe', color: 'text-red-400' }
-    return { label: 'Severe', color: 'text-red-500' }
-  }
-  if (score <= 4) return { label: 'Minimal', color: 'text-green-400' }
-  if (score <= 9) return { label: 'Mild', color: 'text-yellow-400' }
-  if (score <= 14) return { label: 'Moderate', color: 'text-orange-400' }
-  return { label: 'Severe', color: 'text-red-400' }
+function formatDate(timestamp: string): string {
+  return new Date(timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
 }
 
 export default function Assessment() {
   const [type, setType] = useState<AssessmentType | null>(null)
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [step, setStep] = useState(0)
-  const [showResult, setShowResult] = useState(false)
-
-  const questions: Question[] = type === 'phq9' ? PHQ9_QUESTIONS : GAD7_QUESTIONS
-
-  function selectAnswer(value: number) {
-    const q = questions[step]
-    setAnswers((prev) => ({ ...prev, [q.id]: value }))
-    if (step < questions.length - 1) {
-      setStep(step + 1)
-    } else {
-      setShowResult(true)
-    }
-  }
+  const [result, setResult] = useState<AssessmentResult | null>(null)
+  const [error, setError] = useState('')
 
   function reset() {
     setType(null)
     setAnswers({})
     setStep(0)
-    setShowResult(false)
+    setResult(null)
+    setError('')
   }
 
-  const score = Object.values(answers).reduce((a, b) => a + b, 0)
-  const severe = type === 'phq9' && (answers['phq9'] ?? 0) > 0
+  function start(selected: AssessmentType) {
+    setType(selected)
+    setAnswers({})
+    setStep(0)
+    setResult(null)
+    setError('')
+  }
 
-  // Choose assessment type
+  // Selection screen + history
   if (!type) {
+    const history = assessmentService.getHistory().slice(0, 5)
+
     return (
       <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold text-white">Choose an Assessment</h1>
-        <p className="text-slate-400">
-          These are screening tools, not diagnoses. They help understand how you've been feeling recently.
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-white">Assessments</h1>
+          <p className="text-slate-400 text-sm mt-1">
+            These are screening tools, not diagnoses. They help you understand how you have been
+            feeling over the last two weeks.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
-            onClick={() => setType('phq9')}
-            className="p-6 rounded-xl bg-slate-800 border border-slate-700 text-left hover:border-[var(--color-primary)] transition"
+            onClick={() => start('phq9')}
+            className="glass cozy-in rounded-2xl p-6 text-left"
           >
             <h3 className="text-white font-semibold text-lg">PHQ-9</h3>
-            <p className="text-sm text-slate-400 mt-1">Depression screening — 9 questions</p>
+            <p className="text-sm text-slate-400 mt-1">Mood and depression screening, 9 questions</p>
           </button>
           <button
-            onClick={() => setType('gad7')}
-            className="p-6 rounded-xl bg-slate-800 border border-slate-700 text-left hover:border-[var(--color-primary)] transition"
+            onClick={() => start('gad7')}
+            className="glass cozy-in rounded-2xl p-6 text-left"
+            style={{ animationDelay: '0.08s' }}
           >
             <h3 className="text-white font-semibold text-lg">GAD-7</h3>
-            <p className="text-sm text-slate-400 mt-1">Anxiety screening — 7 questions</p>
+            <p className="text-sm text-slate-400 mt-1">Anxiety screening, 7 questions</p>
           </button>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="text-white font-semibold">Your history</h2>
+          {history.length === 0 ? (
+            <EmptyState
+              emoji="📋"
+              title="No assessments yet"
+              description="Take your first check-in above. Your results will appear here."
+            />
+          ) : (
+            history.map((item) => (
+              <div key={item.id} className="glass rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-white font-medium">{ASSESSMENT_TITLES[item.type]}</p>
+                  <p className="text-xs text-slate-500">{formatDate(item.timestamp)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-white font-semibold">
+                    {item.score}/{item.maxScore}
+                  </p>
+                  <p className={`text-xs font-medium ${SEVERITY_COLORS[item.severity]}`}>
+                    {item.severityLabel}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     )
   }
 
   // Result screen
-  if (showResult) {
-    const severity = getSeverity(type, score)
+  if (result) {
+    const recommendations = recommendationService.getRecommendations()
+
     return (
       <div className="max-w-xl mx-auto space-y-6 text-center">
         <CheckCircle2 className="mx-auto text-[var(--color-primary)]" size={40} />
-        <h1 className="text-2xl font-bold text-white">Assessment Complete</h1>
+        <h1 className="text-2xl font-bold text-white">{ASSESSMENT_TITLES[result.type]} complete</h1>
 
-        <div className="p-6 rounded-xl bg-slate-800 border border-slate-700 space-y-2">
+        <div className="glass cozy-in rounded-2xl p-6 space-y-1">
           <p className="text-slate-400 text-sm">Your score</p>
-          <p className="text-4xl font-bold text-white">{score}</p>
-          <p className={`font-semibold ${severity.color}`}>{severity.label}</p>
+          <p className="text-4xl font-bold text-white">
+            {result.score}
+            <span className="text-lg text-slate-500"> / {result.maxScore}</span>
+          </p>
+          <p className={`font-semibold ${SEVERITY_COLORS[result.severity]}`}>{result.severityLabel}</p>
         </div>
 
-        {severe && (
-          <div className="p-4 rounded-lg bg-red-950/50 border border-red-800 flex gap-3 text-left">
-            <AlertTriangle className="text-red-400 shrink-0" size={20} />
-            <p className="text-sm text-red-200">
-              You indicated thoughts of self-harm. Please consider reaching out to a mental
-              health professional or a crisis helpline right away. You don't have to go through this alone.
-            </p>
-          </div>
-        )}
+        {result.highRisk && <SafetyCard />}
 
-        <p className="text-sm text-slate-500">
-          This is a screening result, not a diagnosis. Consider discussing it with a professional.
+        <p className="text-xs text-slate-500">
+          This is a screening result, not a diagnosis. Please discuss it with a healthcare
+          professional if you are concerned.
         </p>
 
-        <div className="flex justify-center gap-3">
+        <div className="space-y-3 text-left">
+          <h2 className="text-white font-semibold">Suggested for you</h2>
+          <RecommendationCards recommendations={recommendations} />
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={reset}
             className="px-5 py-2.5 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800"
           >
-            Take Another
+            Back to assessments
           </button>
-          <button className="px-5 py-2.5 rounded-full bg-[var(--color-primary)] text-white font-semibold hover:opacity-90 flex items-center gap-2">
-            View Recommendations <ArrowRight size={16} />
-          </button>
+          <Link
+            to="/dashboard"
+            className="px-5 py-2.5 rounded-full btn-primary bg-[var(--color-primary)] text-white font-semibold"
+          >
+            Go to dashboard
+          </Link>
         </div>
       </div>
     )
   }
 
   // Question screen
+  const questions = assessmentService.getQuestions(type)
   const currentQuestion = questions[step]
+
+  function selectAnswer(value: number) {
+    const next = { ...answers, [currentQuestion.id]: value }
+    setAnswers(next)
+    setError('')
+
+    if (step < questions.length - 1) {
+      setStep(step + 1)
+      return
+    }
+
+    const saved = assessmentService.submit(type as AssessmentType, next)
+    if (!saved) {
+      setError('Please answer every question before finishing.')
+      return
+    }
+    setResult(saved)
+  }
+
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-slate-400">
-          <span>{type === 'phq9' ? 'PHQ-9' : 'GAD-7'}</span>
-          <span>{step + 1} / {questions.length}</span>
+          <span>{ASSESSMENT_TITLES[type]}</span>
+          <span>
+            {step + 1} / {questions.length}
+          </span>
         </div>
         <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
           <div
@@ -134,21 +199,51 @@ export default function Assessment() {
         </div>
       </div>
 
-      <div className="p-6 rounded-xl bg-slate-800 border border-slate-700 space-y-4">
-        <p className="text-slate-400 text-sm">Over the last 2 weeks, how often have you been bothered by:</p>
+      <div className="glass cozy-in rounded-2xl p-6 space-y-4" key={currentQuestion.id}>
+        <p className="text-slate-400 text-sm">
+          Over the last 2 weeks, how often have you been bothered by:
+        </p>
         <h2 className="text-xl font-semibold text-white">{currentQuestion.text}</h2>
 
         <div className="space-y-2 pt-2">
-          {ANSWER_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => selectAnswer(option.value)}
-              className="w-full text-left px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 hover:border-[var(--color-primary)] hover:bg-slate-800 transition"
-            >
-              {option.label}
-            </button>
-          ))}
+          {ANSWER_OPTIONS.map((option) => {
+            const selected = answers[currentQuestion.id] === option.value
+            return (
+              <button
+                key={option.value}
+                onClick={() => selectAnswer(option.value)}
+                className={`w-full text-left px-4 py-3 rounded-lg border transition ${
+                  selected
+                    ? 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-white'
+                    : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-[var(--color-primary)]'
+                }`}
+              >
+                {option.label}
+              </button>
+            )
+          })}
         </div>
+
+        {currentQuestion.id === 'phq9' && (
+          <p className="text-xs text-slate-500">
+            If you are struggling right now, you can call Tele-MANAS at 14416 anytime, free.
+          </p>
+        )}
+
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+      </div>
+
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setStep(Math.max(0, step - 1))}
+          disabled={step === 0}
+          className="flex items-center gap-1 text-sm text-slate-400 hover:text-white disabled:opacity-30"
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
+        <button onClick={reset} className="text-sm text-slate-500 hover:text-red-400">
+          Cancel
+        </button>
       </div>
     </div>
   )
